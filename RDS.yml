@@ -1,0 +1,47 @@
+Resources:
+  primarydbclustergroup:
+    Type: 'AWS::RDS::DBClusterParameterGroup'
+    Properties:
+      Description: CloudFormation Sample Aurora Cluster Parameter Group
+      Family: aurora-mysql5.7
+      Parameters:
+        time_zone: US/Eastern
+        read_only: '{TrueIfReplica}'
+  primarydbgroup:
+    Type: 'AWS::RDS::DBParameterGroup'
+    Properties:
+      Description: CloudFormation Sample MySQL Parameter Group
+      Family: aurora-mysql5.7
+      Parameters:
+        read_only: '{TrueIfReplica}'
+  udacityprimarycluster:
+    Type: 'AWS::RDS::DBCluster'
+    Properties:
+      Engine: aurora-mysql
+      EngineVersion: '5.7.mysql_aurora.2.03.4'
+      MasterUsername: admin
+      MasterUserPassword: mysqladmin123
+      BackupRetentionPeriod: '1'
+      DBSubnetGroupName: primarysubnetgrp
+      DBClusterParameterGroupName: !Ref primarydbclustergroup
+      VpcSecurityGroupIds:
+        - sg-0ddeb10eb5dcfe716
+  udacityprimarydb:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      Engine: aurora-mysql
+      EngineVersion: '5.7.mysql_aurora.2.03.4'
+      DBClusterIdentifier: !Ref udacityprimarycluster
+      DBInstanceClass: db.t3.small
+      DBSubnetGroupName: primarysubnetgrp
+      DBParameterGroupName: !Ref primarydbgroup
+Outputs:
+  primarydbclustergroup:
+    Description: Cluser grp
+    Value: !Ref primarydbclustergroup
+  primarydbgroup:
+    Description: paramter group
+    Value: !Ref primarydbgroup
+  udacityprimarydb:
+    Description: Database Creation
+    Value: !Ref udacityprimarydb
